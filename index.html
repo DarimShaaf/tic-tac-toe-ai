@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Play Tic Tac Toe against the computer with easy or hard AI. Track your wins, losses, and draws across sessions." />
+    <meta name="theme-color" content="#0d1117" />
+    <title>Tic Tac Toe vs Computer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <h1>Tic‑Tac‑Toe</h1>
+          <p class="subtitle">Play against the computer (Easy or Hard)</p>
+        </div>
+
+        <div class="status" aria-live="polite">
+          <span class="pill" id="turnPill">—</span>
+          <span class="pill" id="scorePill">You 0 · CPU 0 · Draw 0</span>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="card">
+          <div class="controls" aria-label="Game controls">
+            <div class="controlGroup">
+              <span class="label">You play</span>
+              <div class="seg" role="group" aria-label="Choose your mark">
+                <button class="segBtn isActive" data-human="X" type="button">X</button>
+                <button class="segBtn" data-human="O" type="button">O</button>
+              </div>
+            </div>
+
+            <div class="controlGroup">
+              <span class="label">Difficulty</span>
+              <div class="seg" role="group" aria-label="Choose difficulty">
+                <button class="segBtn" data-difficulty="easy" type="button">Easy</button>
+                <button class="segBtn isActive" data-difficulty="hard" type="button">Hard</button>
+              </div>
+            </div>
+
+            <div class="controlGroup controlGroupRight">
+              <button class="btn" id="newBtn" type="button">New round</button>
+              <button class="btn" id="resetScoreBtn" type="button">Reset score</button>
+            </div>
+          </div>
+
+          <div class="boardWrap">
+            <div class="board" id="board" role="grid" aria-label="Tic tac toe board" aria-rowcount="3" aria-colcount="3"></div>
+          </div>
+
+          <div class="hintRow">
+            <span class="hint">Tip: click a square or use 1–9 on your keyboard (like a numpad) to play.</span>
+          </div>
+        </section>
+
+        <aside class="card side">
+          <h2>How it plays</h2>
+          <ul class="list">
+            <li><strong>Easy</strong>: makes occasional mistakes.</li>
+            <li><strong>Hard</strong>: perfect play (minimax). You can only draw or lose.</li>
+          </ul>
+          <div class="mini">
+            <div class="miniTitle">Keyboard mapping</div>
+            <div class="kb">
+              <div class="k">7</div><div class="k">8</div><div class="k">9</div>
+              <div class="k">4</div><div class="k">5</div><div class="k">6</div>
+              <div class="k">1</div><div class="k">2</div><div class="k">3</div>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
