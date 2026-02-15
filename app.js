@@ -222,16 +222,32 @@ function chooseCpuMove() {
     if (Math.random() < 0.35) return moves[Math.floor(Math.random() * moves.length)];
   }
 
-  return bestMoveMinimax(board, cpu).idx;
+  return bestMoveMinimax(board, cpu, new Map()).idx;
 }
 
-function bestMoveMinimax(b, player) {
+function bestMoveMinimax(b, player, memo) {
   // Returns best move for `player` assuming perfect play.
   // Score from CPU perspective: win=+10, loss=-10, draw=0 (with depth)
+  const key = `${b.join("")}|${player}`;
+  const cached = memo.get(key);
+  if (cached) return cached;
+
   const { winner } = getWinner(b);
-  if (winner === cpu) return { idx: -1, score: 10 };
-  if (winner === human) return { idx: -1, score: -10 };
-  if (b.every((x) => x !== "")) return { idx: -1, score: 0 };
+  if (winner === cpu) {
+    const out = { idx: -1, score: 10 };
+    memo.set(key, out);
+    return out;
+  }
+  if (winner === human) {
+    const out = { idx: -1, score: -10 };
+    memo.set(key, out);
+    return out;
+  }
+  if (b.every((x) => x !== "")) {
+    const out = { idx: -1, score: 0 };
+    memo.set(key, out);
+    return out;
+  }
 
   const moves = emptyMoves(b);
   let best = { idx: moves[0], score: player === cpu ? -Infinity : Infinity };
@@ -239,7 +255,7 @@ function bestMoveMinimax(b, player) {
   for (const idx of moves) {
     const next = b.slice();
     next[idx] = player;
-    const result = bestMoveMinimax(next, other(player));
+    const result = bestMoveMinimax(next, other(player), memo);
 
     // depth adjustment: prefer quicker wins and slower losses
     const scoreAdjusted = result.score + (result.score > 0 ? -1 : result.score < 0 ? 1 : 0);
@@ -251,6 +267,7 @@ function bestMoveMinimax(b, player) {
     }
   }
 
+  memo.set(key, best);
   return best;
 }
 
