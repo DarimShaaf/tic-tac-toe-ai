@@ -226,45 +226,61 @@ function chooseCpuMove() {
 }
 
 function bestMoveMinimax(b, player, memo) {
-  // Returns best move for `player` assuming perfect play.
-  // Score from CPU perspective: win=+10, loss=-10, draw=0 (with depth)
-  const key = `${b.join("")}|${player}`;
-  const cached = memo.get(key);
-  if (cached) return cached;
-
-  const { winner } = getWinner(b);
-  if (winner === cpu) {
-    const out = { idx: -1, score: 10 };
-    memo.set(key, out);
-    return out;
-  }
-  if (winner === human) {
-    const out = { idx: -1, score: -10 };
-    memo.set(key, out);
-    return out;
-  }
-  if (b.every((x) => x !== "")) {
-    const out = { idx: -1, score: 0 };
-    memo.set(key, out);
-    return out;
-  }
-
   const moves = emptyMoves(b);
-  let best = { idx: moves[0], score: player === cpu ? -Infinity : Infinity };
+  const preferred = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 
-  for (const idx of moves) {
+  let bestIdx = moves[0];
+  let bestScore = -Infinity;
+  let alpha = -Infinity;
+  const beta = Infinity;
+
+  const orderedMoves = preferred.filter((idx) => b[idx] === "");
+  for (const idx of orderedMoves) {
     const next = b.slice();
     next[idx] = player;
-    const result = bestMoveMinimax(next, other(player), memo);
+    const score = minimaxScore(next, other(player), 1, alpha, beta, memo);
 
-    // depth adjustment: prefer quicker wins and slower losses
-    const scoreAdjusted = result.score + (result.score > 0 ? -1 : result.score < 0 ? 1 : 0);
+    if (score > bestScore) {
+      bestScore = score;
+      bestIdx = idx;
+    }
+    alpha = Math.max(alpha, bestScore);
+  }
+
+  return { idx: bestIdx, score: bestScore };
+}
+
+function minimaxScore(b, player, depth, alpha, beta, memo) {
+  const boardKey = b.map((cell) => (cell === "" ? "-" : cell)).join("");
+  const key = `${boardKey}|${player}|${depth}`;
+  const cached = memo.get(key);
+  if (cached !== undefined) return cached;
+
+  const { winner } = getWinner(b);
+  if (winner === cpu) return 10 - depth;
+  if (winner === human) return depth - 10;
+  if (b.every((x) => x !== "")) return 0;
+
+  const moves = emptyMoves(b);
+  const preferred = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+  const orderedMoves = preferred.filter((idx) => b[idx] === "");
+
+  let best = player === cpu ? -Infinity : Infinity;
+
+  for (const idx of orderedMoves) {
+    const next = b.slice();
+    next[idx] = player;
+    const score = minimaxScore(next, other(player), depth + 1, alpha, beta, memo);
 
     if (player === cpu) {
-      if (scoreAdjusted > best.score) best = { idx, score: scoreAdjusted };
+      best = Math.max(best, score);
+      alpha = Math.max(alpha, best);
     } else {
-      if (scoreAdjusted < best.score) best = { idx, score: scoreAdjusted };
+      best = Math.min(best, score);
+      beta = Math.min(beta, best);
     }
+
+    if (beta <= alpha) break;
   }
 
   memo.set(key, best);
